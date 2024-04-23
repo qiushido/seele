@@ -64,6 +64,7 @@ func Execute(ctx context.Context, config *entities.RunjConfig) (*entities.Execut
 		Spec:             spec,
 		RootlessEUID:     userNamespaceEnabled,
 		RootlessCgroups:  userNamespaceEnabled,
+		NoNewKeyring:     config.NoNewKeyring,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("Error creating libcontainer config: %w", err)
@@ -132,7 +133,7 @@ func Execute(ctx context.Context, config *entities.RunjConfig) (*entities.Execut
 		Args:            config.Command,
 		Env:             []string{pathEnv},
 		Cwd:             config.Cwd,
-		User:            "65534:65534",
+		User:            fmt.Sprintf("%d:%d", config.UserNamespace.ContainerUID, config.UserNamespace.ContainerGID),
 		Stdin:           stdInFile,
 		Stdout:          stdOutFile,
 		Stderr:          stdErrFile,
@@ -144,7 +145,7 @@ func Execute(ctx context.Context, config *entities.RunjConfig) (*entities.Execut
 	processFinishedCtx, processFinishedCtxCancel := context.WithCancel(context.Background())
 	defer processFinishedCtxCancel()
 
-	timeLimit := time.Duration(config.Limits.TimeMs*3) * time.Millisecond
+	timeLimit := time.Duration(config.Limits.TimeMs)*time.Millisecond + time.Millisecond*1000
 	timeLimitCtx, timeLimitCtxCancel := context.WithTimeout(context.Background(), timeLimit)
 	defer timeLimitCtxCancel()
 

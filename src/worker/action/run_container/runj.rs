@@ -25,6 +25,8 @@ pub struct RunjConfig {
     pub mounts: Vec<MountConfig>,
 
     pub limits: LimitsConfig,
+
+    pub no_new_keyring: bool,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -36,6 +38,8 @@ pub struct UserNamespaceConfig {
     pub root_gid: u32,
     pub gid_map_begin: u32,
     pub gid_map_count: u32,
+    pub container_uid: u32,
+    pub container_gid: u32,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

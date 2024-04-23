@@ -182,6 +182,7 @@ func makeContainerSpec(config *entities.RunjConfig, uidMappings []specs.LinuxIDM
 				Pids:   cgroupPidRules,
 			},
 			Namespaces: namespaces,
+			MountLabel: specs.Process{}.SelinuxLabel,
 		},
 	}, nil
 }

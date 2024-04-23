@@ -4,6 +4,7 @@ ARG GIT_NAME
 FROM golang:1.21-bookworm AS runj
 WORKDIR /usr/src/app/
 COPY runj/go.mod runj/go.sum ./
+RUN go env -w GOPROXY="https://goproxy.cn,direct"
 RUN go mod download && go mod verify
 COPY runj/ ./
 RUN make build

@@ -10,16 +10,19 @@ type RunjConfig struct {
 	Fd            *FdConfig            `mapstructure:"fd"`
 	Mounts        []*MountConfig       `mapstructure:"mounts"`
 	Limits        *LimitsConfig        `mapstructure:"limits" validate:"required"`
+	NoNewKeyring  bool                 `mapstructure:"no_new_keyring" validate:"required"`
 }
 
 type UserNamespaceConfig struct {
-	Enabled     bool   `mapstructure:"enabled"`
-	RootUid     uint32 `mapstructure:"root_uid" validate:"required"`
-	UidMapBegin uint32 `mapstructure:"uid_map_begin" validate:"required"`
-	UidMapCount uint32 `mapstructure:"uid_map_count" validate:"required"`
-	RootGid     uint32 `mapstructure:"root_gid" validate:"required"`
-	GidMapBegin uint32 `mapstructure:"gid_map_begin" validate:"required"`
-	GidMapCount uint32 `mapstructure:"gid_map_count" validate:"required"`
+	Enabled      bool   `mapstructure:"enabled"`
+	RootUid      uint32 `mapstructure:"root_uid" validate:"required"`
+	UidMapBegin  uint32 `mapstructure:"uid_map_begin" validate:"required"`
+	UidMapCount  uint32 `mapstructure:"uid_map_count" validate:"required"`
+	RootGid      uint32 `mapstructure:"root_gid" validate:"required"`
+	GidMapBegin  uint32 `mapstructure:"gid_map_begin" validate:"required"`
+	GidMapCount  uint32 `mapstructure:"gid_map_count" validate:"required"`
+	ContainerUID uint32 `mapstructure:"container_uid" validate:"required"`
+	ContainerGID uint32 `mapstructure:"container_gid" validate:"required"`
 }
 
 type OverlayfsConfig struct {

@@ -11,8 +11,7 @@ use crate::{
     conf,
     entities::ActionReportExt,
     worker::{
-        run_container::{self, runj},
-        ActionContext,
+        action::run_container::runj::MountConfig, run_container::{self, runj}, ActionContext
     },
 };
 
@@ -39,7 +38,7 @@ pub async fn execute(
     let result = async {
         let mut run_container_config = config.run_container_config.clone();
 
-        run_container_config.cwd = DEFAULT_MOUNT_DIRECTORY.to_owned();
+        // run_container_config.cwd = DEFAULT_MOUNT_DIRECTORY.to_owned();
 
         run_container_config.mounts.push(run_container::MountConfig::Full(runj::MountConfig {
             from: mount_directory.clone(),
@@ -74,6 +73,12 @@ pub async fn execute(
                 let options = if file.exec { Some(vec!["exec".to_owned()]) } else { None };
 
                 runj::MountConfig { from: from_path, to: to_path, options }
+            }));
+        }
+
+        for volume in &conf::CONFIG.worker.volumes {
+            run_container_config.mounts.push(run_container::MountConfig::Full({
+                runj::MountConfig { from: volume.from, to: volume.to, options: volume.options }
             }));
         }
 

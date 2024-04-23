@@ -20,15 +20,17 @@ pub async fn make_runj_config(ctx: &ActionContext, config: Config) -> Result<run
     let user_namespace = {
         match &conf::CONFIG.work_mode {
             SeeleWorkMode::Bare | SeeleWorkMode::BareSystemd | SeeleWorkMode::Containerized => {
-                let config = &conf::CONFIG.worker.action.run_container;
+                let config_runc = &conf::CONFIG.worker.action.run_container;
                 Some(runj::UserNamespaceConfig {
                     enabled: true,
-                    root_uid: config.userns_uid,
+                    root_uid: config_runc.userns_uid,
                     uid_map_begin: idmap::SUBUIDS.begin,
                     uid_map_count: idmap::SUBUIDS.count,
-                    root_gid: config.userns_gid,
+                    root_gid: config_runc.userns_gid,
                     gid_map_begin: idmap::SUBGIDS.begin,
                     gid_map_count: idmap::SUBGIDS.count,
+                    container_uid: config.container_uid,
+                    container_gid: config.container_gid,
                 })
             }
             SeeleWorkMode::RootlessContainerized => None,
@@ -81,6 +83,7 @@ pub async fn make_runj_config(ctx: &ActionContext, config: Config) -> Result<run
         fd,
         mounts,
         limits: config.limits.into(),
+        no_new_keyring: conf::CONFIG.worker.no_new_keyring,
     })
 }
 

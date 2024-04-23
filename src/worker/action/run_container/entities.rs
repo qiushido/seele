@@ -32,11 +32,27 @@ pub struct Config {
 
     #[serde(default)]
     pub limits: LimitsConfig,
+
+    #[serde(default = "default_container_uid")]
+    pub container_uid: u32,
+
+    #[serde(default = "default_container_gid")]
+    pub container_gid: u32,
 }
 
 #[inline]
 fn default_cwd() -> PathBuf {
-    "/".into()
+    "/seele".into()
+}
+
+#[inline]
+fn default_container_uid() -> u32 {
+    1000
+}
+
+#[inline]
+fn default_container_gid() -> u32 {
+    1000
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -115,6 +131,9 @@ pub struct LimitsConfig {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub fsize_kib: Option<u64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub no_file: Option<u64>,
 }
 
 impl From<LimitsConfig> for runj::LimitsConfig {
@@ -123,7 +142,7 @@ impl From<LimitsConfig> for runj::LimitsConfig {
         const DEFAULT_MEMORY_LIMIT_BYTES: i64 = 256 * 1024 * 1024; // 256 MiB
         const DEFAULT_PIDS_LIMIT: i64 = 32;
         const DEFAULT_CORE: u64 = 0; // Disable core dump
-        const DEFAULT_NO_FILE: u64 = 64;
+        const DEFAULT_NO_FILE: u64 = 1000000;
         const DEFAULT_FSIZE_BYTES: u64 = 64 * 1024 * 1024; // 64 MiB
 
         runj::LimitsConfig {
@@ -138,7 +157,9 @@ impl From<LimitsConfig> for runj::LimitsConfig {
             },
             rlimit: runj::RlimitConfig {
                 core: RlimitItem::new_single(DEFAULT_CORE),
-                no_file: RlimitItem::new_single(DEFAULT_NO_FILE),
+                no_file: RlimitItem::new_single(
+                    val.no_file.unwrap_or(DEFAULT_NO_FILE),
+                ),
                 fsize: RlimitItem::new_single(
                     val.fsize_kib.map(|fsize_kib| fsize_kib * 1024).unwrap_or(DEFAULT_FSIZE_BYTES),
                 ),

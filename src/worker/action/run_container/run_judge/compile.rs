@@ -289,6 +289,8 @@ mod tests {
                 paths: None,
                 mounts: vec![],
                 limits: Default::default(),
+                container_uid: 65534,
+                container_gid: 65534,
             },
             sources: vec!["main.c".try_into().unwrap()],
             saves: vec!["main".to_owned()],
